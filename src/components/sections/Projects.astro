@@ -1,0 +1,104 @@
+---
+import Section from "../Section.astro"
+import { getCv } from "@/data/cv"
+import { getLabels } from "@/lib/i18n"
+
+interface Props {
+  title?: string
+  projects?: Project[]
+}
+
+type Project = { name: string; company?: string | null; description: string; highlights: string[]; url?: string | null }
+const { title: propsTitle, projects: propsProjects } = Astro.props
+
+const projects = propsProjects ?? getCv(Astro.url.pathname).projects
+const labels = getLabels(Astro.url.pathname)
+const title = propsTitle ?? labels.projects
+const normalizeCompany = (company?: string | null) => company?.trim().toLowerCase() ?? ""
+const freelanceProjects = (projects as unknown as Project[]).filter(({ company }) => normalizeCompany(company) === "freelance")
+const personalProjects = (projects as unknown as Project[]).filter(({ company }) => {
+  const normalizedCompany = normalizeCompany(company)
+  return normalizedCompany === "personal" || normalizedCompany === ""
+})
+const projectGroups = [
+  { title: labels.freelance, projects: freelanceProjects },
+  { title: labels.personal, projects: personalProjects },
+].filter(({ projects: groupProjects }) => groupProjects.length > 0)
+---
+
+<Section title={title}>
+  <div class="print-projects print">
+    {projectGroups.map(({ title, projects: groupProjects }) => (
+      <div class="project-group">
+        <h3>{title}</h3>
+        <p>
+          {groupProjects.map((project, index) => (
+            <Fragment>
+              {project.url ? <a href={project.url} target="_blank" rel="noopener noreferrer">{project.name}</a> : <span>{project.name}</span>}
+              {index < groupProjects.length - 1 && <span class="separator"> · </span>}
+            </Fragment>
+          ))}
+        </p>
+      </div>
+    ))}
+  </div>
+
+  <div class="screen-projects no-print">
+    {projectGroups.map(({ title, projects: groupProjects }) => (
+      <details>
+        <summary>{title} <span>{groupProjects.length} {labels.projectsCount}</span></summary>
+        <ul>
+          {groupProjects.map((project) => (
+            <li>
+              <div>
+                        {project.url ? (
+                            <Fragment>
+                              <strong>{project.name}</strong>
+                              <a class="project-link-hint" href={project.url} target="_blank" rel="noopener noreferrer">{labels.viewProject} ↗</a>
+                            </Fragment>
+                          ) : <strong>{project.name}</strong>}
+                <p>{project.description}</p>
+              </div>
+              {project.highlights.length > 0 && (
+                <div class="project-highlights">
+                  {project.highlights.map((highlight) => <span>{highlight}</span>)}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </details>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .print-projects { display: grid; gap: 0.5rem; }
+  .project-group { border-left: 2px solid #ddd; padding-left: 0.7rem; }
+  h3 { color: #222; font-family: inherit; font-size: 0.78rem; margin: 0 0 0.15rem; }
+  .print-projects p { font-size: 0.78rem; line-height: 1.45; }
+  .print-projects a { color: #222; text-decoration: underline; text-underline-offset: 2px; }
+  .separator { color: #aaa; }
+
+  .screen-projects { display: grid; gap: 0.65rem; }
+  .screen-projects details { border: 1px solid #e8e8e8; border-radius: 8px; padding: 0 1rem; }
+  .screen-projects summary { cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: #333; font-size: 0.85rem; list-style: none; padding: 0.85rem 0; }
+  .screen-projects summary::-webkit-details-marker { display: none; }
+  .screen-projects summary::after { color: #777; content: "+"; font-size: 1.1rem; }
+  .screen-projects details[open] summary::after { content: "−"; }
+  .screen-projects summary span { color: #777; font-size: 0.72rem; margin-left: 0.35rem; }
+  .screen-projects ul { display: grid; gap: 0.65rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 0 0 1rem; }
+  .screen-projects li { border-left: 2px solid #ddd; padding-left: 0.7rem; }
+  .screen-projects a, .screen-projects strong { color: #111; font-size: 0.85rem; }
+  .screen-projects a:hover { text-decoration: underline; }
+  .project-link-hint { background: #f3f3f3; border-radius: 999px; color: #444; display: inline-block; font-size: 0.65rem; font-weight: 500; margin-left: 0.45rem; padding: 0.12rem 0.4rem; white-space: nowrap; }
+  .screen-projects p { font-size: 0.78rem; margin-top: 0.15rem; }
+  .project-highlights { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.45rem; }
+  .project-highlights span { background: #f3f3f3; border-radius: 999px; color: #555; font-size: 0.65rem; line-height: 1.25; padding: 0.18rem 0.45rem; }
+
+  @media print {
+    .print-projects { gap: 0.2rem; }
+    .project-group { padding-left: 0.45rem; }
+    h3, p { font-size: 0.68rem; }
+  }
+</style>

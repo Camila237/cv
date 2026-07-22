@@ -1,0 +1,26 @@
+{
+  "name": "minimalist-portfolio-json",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "validate:cv": "node scripts/validate-cv.mjs",
+    "build": "npm run validate:cv && astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "0.4.1",
+    "astro": "4.3.2",
+    "hotkeypad": "0.1.0",
+    "typescript": "5.3.3"
+  },
+  "overrides": {
+    "prettier": "3.0.0"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  }
+}

@@ -1,0 +1,119 @@
+---
+import Section from "../Section.astro";
+import { getCv } from "@/data/cv";
+import { getLabels } from "@/lib/i18n";
+const { certificates } = getCv(Astro.url.pathname)
+const labels = getLabels(Astro.url.pathname)
+---
+
+<Section title={labels.certifications}>
+  <ul>
+    {
+      certificates.map(({ name, date, validThrough, issuer, url }) => {
+        const startYear = date ? new Date(date).getFullYear() : "¿?";
+        const endYear = validThrough
+          ? new Date(validThrough).getFullYear()
+          : "Actual";
+        const displayDate = `${startYear} - ${endYear}`;
+
+        return (
+          <li>
+            <article>
+              <header class="cert-header">
+                <div class="cert-info">
+                  <h3>
+                    {name}
+                    {url && <a class="credential-link screen-only" href={url} target="_blank" rel="noopener noreferrer">{labels.viewCredential} ↗</a>}
+                  </h3>
+                  <p>{issuer}</p>
+                </div>
+                <small class="cert-date">{displayDate}</small>
+              </header>
+            </article>
+          </li>
+        );
+      })
+    }
+  </ul>
+</Section>
+
+<style>
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  article {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  }
+
+  .cert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .cert-info h3 {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .cert-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .cert-date {
+    font-size: 0.75rem;
+    color: #999;
+    white-space: nowrap;
+  }
+
+  @media (width <= 700px) {
+    .cert-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .cert-date {
+      align-self: flex-end;
+    }
+  }
+
+  .credential-link {
+    background: #f3f3f3;
+    border-radius: 999px;
+    color: #444;
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 0.12rem 0.4rem;
+  }
+
+  .credential-link:hover {
+    background: #e8e8e8;
+  }
+
+  @media print {
+    ul { display: block; }
+    li { break-inside: avoid; }
+    article { border: 0; box-shadow: none; padding: 0.2rem 0; }
+    .cert-info h3, .cert-info p, .cert-date { font-size: 0.68rem; }
+  }
+</style>

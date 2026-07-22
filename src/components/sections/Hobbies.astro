@@ -1,0 +1,35 @@
+---
+import Section from "../Section.astro"
+import { getCv } from "@/data/cv"
+import { getLabels } from "@/lib/i18n"
+const { hobbies } = getCv(Astro.url.pathname)
+const labels = getLabels(Astro.url.pathname)
+---
+
+<Section title={labels.hobbies}>
+  <ul>
+    {hobbies.map(hobby => (
+      <li>{hobby}</li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  ul {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  li {
+    align-items: center;
+    background: #eee;
+    border-radius: 6px;
+    color: black;
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: 500;
+    gap: 4px;
+    padding: 0.2rem 0.6rem;
+  }
+</style>

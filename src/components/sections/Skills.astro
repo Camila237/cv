@@ -1,0 +1,184 @@
+---
+import Section from "../Section.astro";
+import HTML from "@/icons/html.astro";
+import CSS from "@/icons/css.astro";
+import JavaScript from "@/icons/javascript.astro";
+import TypeScript from "@/icons/type.astro";
+import React from "@/icons/react.astro";
+import Node from "@/icons/node.astro";
+import MySQL from "@/icons/sql.astro";
+import Git from "@/icons/git.astro";
+import GitHub from "@/icons/GitHub.astro";
+import GitLab from "@/icons/gitlab.astro";
+import Bitbucket from "@/icons/bitbucket.astro";
+import Jira from "@/icons/jira.astro";
+import Asana from "@/icons/asana.astro";
+import Trello from "@/icons/trello.astro";
+import Confluence from "@/icons/confluence.astro";
+import Miro from "@/icons/miro.astro";
+import TensorFlow from "@/icons/tensorflow.astro";
+import N8N from "@/icons/n8n.astro";
+import GoogleCloud from "@/icons/googlecloud.astro";
+import Azure from "@/icons/azure.astro";
+import AWS from "@/icons/aws.astro";
+import Tailwind from "@/icons/tailwind.astro";
+import Next from "@/icons/next.astro";
+import { getCv } from "@/data/cv";
+import { getLocale } from "@/data/cv";
+import { getLabels } from "@/lib/i18n"
+import Swift from "@/icons/swift.astro";
+import SwiftUI from "@/icons/swiftui.astro";
+import Kotlin from "@/icons/kotlin.astro";
+import Flutter from "@/icons/flutter.astro";
+import Java from "@/icons/java.astro";
+import ObjectiveC from "@/icons/objectivec.astro";
+import Python from "@/icons/python.astro";
+import PHP from "@/icons/php.astro";
+import Go from "@/icons/go.astro";
+import GraphQL from "@/icons/graphql.astro";
+import MongoDB from "@/icons/mongodb.astro";
+import Firebase from "@/icons/firebase.astro";
+import Supabase from "@/icons/supabase.astro";
+import Postman from "@/icons/postman.astro";
+import Figma from "@/icons/figma.astro";
+import Docker from "@/icons/docker.astro";
+import Bitrise from "@/icons/bitrise.astro";
+import CodeMagic from "@/icons/codemagic.astro";
+import PlayStore from "@/icons/playstore.astro";
+import AppleStore from "@/icons/applestore.astro";
+import AppGallery from "@/icons/appgallery.astro";
+import SkillFallbackIcon from "@/icons/SkillFallbackIcon.astro";
+
+const SKILLS_ICONS: Record<string, any> = {
+  HTML,
+  CSS,
+  JavaScript,
+  TypeScript,
+  React,
+  Node,
+  MySQL,
+  Git,
+  GitHub,
+  GitLab,
+  Bitbucket,
+  Jira,
+  Asana,
+  Trello,
+  Confluence,
+  Miro,
+  TensorFlow,
+  N8N,
+  GoogleCloud,
+  Azure,
+  AWS,
+  Next,
+  Tailwind,
+  Swift,
+  SwiftUI,
+  Kotlin,
+  Flutter,
+  Java,
+  ObjectiveC,
+  Python,
+  PHP,
+  Go,
+  GraphQL,
+  MongoDB,
+  Firebase,
+  Supabase,
+  Postman,
+  Figma,
+  Docker,
+  Bitrise,
+  CodeMagic,
+  PlayStore,
+  AppleStore,
+  AppGallery,
+};
+
+const ICON_ALIASES: Record<string, string> = {
+  "Next.js": "Next",
+  "React Native": "React",
+  "Node Js": "Node",
+  SQL: "MySQL",
+  Gitlab: "GitLab",
+  Gilab: "GitLab",
+  "Tensor Flow": "TensorFlow",
+  "Google Cloud": "GoogleCloud",
+  "Objective-C": "ObjectiveC",
+  "Play Store": "PlayStore",
+  "Apple Store": "AppleStore",
+  "App Gallery": "AppGallery",
+};
+
+const { skills: skillsSection, featuredSkills = [] } = getCv(Astro.url.pathname)
+const skills = skillsSection.items
+const labels = getLabels(Astro.url.pathname)
+const locale = getLocale(Astro.url.pathname)
+
+const LEVEL_ORDER = locale === "en"
+  ? ["Master", "Expert", "Advanced", "Intermediate", "Basic"]
+  : ["Master", "Experto", "Avanzado", "Intermedio", "Basico"]
+const PRINTABLE_LEVELS = new Set(LEVEL_ORDER.slice(0, -1))
+const printableSkills = featuredSkills
+
+const skillGroups = LEVEL_ORDER.map((level) => ({
+  level,
+  skills: skills.filter((skill) => skill.level === level),
+})).filter(({ skills }) => skills.length > 0)
+---
+
+<Section title={labels.skills}>
+  <div class="ats-skills print">
+    <p>{printableSkills.join(" · ")}</p>
+  </div>
+
+  <div class="skills-groups no-print">
+    {skillGroups.map(({ level, skills: groupSkills }) => (
+      <div class="skill-group">
+        <h3>{locale === "en" ? "Level" : "Nivel"} {level}</h3>
+        <ul class="skills-list">
+          {groupSkills.map((skill) => {
+            const iconName = ICON_ALIASES[skill.name] || skill.name
+            const Icon = SKILLS_ICONS[iconName]
+
+            return <li>{Icon ? <Icon /> : <SkillFallbackIcon />}<span>{skill.name}</span></li>
+          })}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .skills-groups { display: grid; gap: 1rem; }
+
+  .skill-group h3, .other-skills summary {
+    color: #555;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin: 0 0 0.45rem;
+  }
+
+  .skills-list {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  li {
+    align-items: center;
+    background: #eee;
+    border-radius: 6px;
+    color: black;
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: 500;
+    gap: 4px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .ats-skills p { color: #222; font-size: 0.7rem; line-height: 1.3; margin: 0; }
+  .ats-skills strong { color: #111; }
+</style>

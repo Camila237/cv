@@ -1,0 +1,94 @@
+---
+import Layout from "@/layouts/Layout.astro"
+
+import About from "@/components/sections/About.astro"
+import Education from "@/components/sections/Education.astro"
+import Experience from "@/components/sections/Experience.astro"
+import Certifiates from "@/components/sections/Certifiates.astro"
+import Hero from "@/components/sections/Hero.astro"
+import Skills from "@/components/sections/Skills.astro"
+import KeyboardManager from "@/components/KeyboardManager.astro"
+import { getCv, getUnfilteredProjects, getComplementaryWork } from "@/data/cv"
+import { getLabels } from "@/lib/i18n"
+import LanguageSwitcher from "@/components/LanguageSwitcher.astro"
+import ComplementaryWork from "@/components/sections/ComplementaryWork.astro"
+import Languages from "@/components/sections/Languages.astro"
+import Courses from "@/components/sections/Courses.astro"
+import Diplomas from "@/components/sections/Diplomas.astro"
+import Hobbies from "@/components/sections/Hobbies.astro"
+import Specializations from "@/components/sections/Specializations.astro"
+import SectionRenderer from "@/components/SectionRenderer.astro"
+
+const { basics: { name, label } } = getCv(Astro.url.pathname)
+const labels = getLabels(Astro.url.pathname)
+const unfilteredProjects = getUnfilteredProjects(Astro.url.pathname)
+const complementaryWork = getComplementaryWork(Astro.url.pathname)
+
+const screenSections = [
+  { component: About },
+  { component: Skills },
+  { component: Experience },
+  {
+    component: ComplementaryWork,
+    props: { work: complementaryWork, projects: unfilteredProjects, title: labels.complementaryExperience },
+    condition: () => complementaryWork.length > 0,
+  },
+  { component: Education },
+  { component: Certifiates },
+  {
+    type: 'group',
+    title: labels.additional,
+    sections: [
+      { component: Languages },
+      { component: Diplomas },
+      { component: Courses },
+      { component: Hobbies },
+    ],
+  },
+]
+
+const printSections = [
+  { component: About },
+  { component: Experience, props: { print: true } },
+  {
+    component: ComplementaryWork,
+    props: { work: complementaryWork, projects: unfilteredProjects, title: labels.complementaryExperience },
+    condition: () => complementaryWork.length > 0,
+  },
+  { component: Certifiates },
+  { component: Education },
+  { component: Courses, props: { print: true, title: labels.complementaryEducation } },
+  { component: Skills },
+  { component: Specializations },
+  { component: Languages, props: { print: true } },
+]
+---
+
+<Layout title={`Portafolio de ${name} - ${label}`}>
+  <main>
+    <LanguageSwitcher />
+    <Hero />
+    <div class="screen-only">
+      <SectionRenderer sections={screenSections} />
+    </div>
+    <div class="print">
+      <SectionRenderer sections={printSections} />
+    </div>
+  </main>
+
+  <KeyboardManager />
+</Layout>
+
+<style>
+  main {
+    padding: 2.5rem 1.5rem;
+    margin: auto;
+    width: 100%;
+  }
+
+  @media (width <= 700px) {
+    main {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
